@@ -1,0 +1,160 @@
+# replicaCount -- number of replicas for nginx deployment.
+replicaCount: 1
+
+image:
+  # image.repository -- image repository
+  repository: nginx
+  # image.tag -- image tag (chart's appVersion value will be used if not set)
+  tag: ""
+  # image.pullPolicy -- image pull policy
+  pullPolicy: IfNotPresent
+
+# imagePullSecrets -- image pull secret for private images
+imagePullSecrets: []
+# nameOverride -- override name of the chart
+nameOverride: ""
+# fullnameOverride -- full name of the chart.
+fullnameOverride: ""
+
+# -- Custom labels to add into metadata
+additionalLabels: {}
+# foo: bar
+
+serviceAccount:
+  # serviceAccount.create -- specifies whether a service account should be created
+  create: false
+  # serviceAccount.annotations -- annotations to add to the service account
+  annotations: {}
+  # serviceAccount.name -- the name of the service account to use; if not set and create is true, a name is generated using the fullname template
+  name:
+
+# podSecurityContext -- specifies security settings for a pod
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# securityContext -- specifies security settings for a container
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# deploymentAnnotations -- annotations to add to the deployment
+deploymentAnnotations: {}
+# podAnnotations -- annotations to add to the pod
+podAnnotations: {}
+
+service:
+  # service.type -- service type
+  type: NodePort 
+  # service.port -- service port
+  port: 80
+  targetPort: 80
+
+ingress:
+  # ingress.enabled -- enables Ingress for nginx
+  enabled: false
+  # ingress.annotations -- ingress annotations
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  # ingress.hosts -- ingress accepted hostnames
+  hosts: []
+  #  - host: chart-example.local
+  #    paths: []
+  # ingress.tls -- ingress TLS configuration
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# resources -- custom resource configuration
+resources: {}
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# nodeSelector -- node for scheduler pod assignment
+nodeSelector: {}
+
+# tolerations -- tolerations for scheduler pod assignment
+tolerations: []
+
+# affinity -- affinity for scheduler pod assignment
+affinity: {}
+
+# volumeMounts -- additional volume mounts
+volumeMounts: []
+  # - name: cache
+  #   mountPath: /data/nginx/cache
+
+# volumes -- additional volumes
+volumes: []
+  # - name: cache
+  #   emptyDir: {}
+
+livenessProbe:
+  httpGet:
+    # livenessProbe.httpGet.path -- path for liveness probe
+    path: /
+    # livenessProbe.httpGet.port -- port for liveness probe
+    port: http
+
+readinessProbe:
+  httpGet:
+    # readinessProbe.httpGet.path -- path for readiness probe
+    path: /
+    # readinessProbe.httpGet.port -- port for readiness probe
+    port: http
+
+# env -- additional environment variables for the deployment
+env: []
+  # - name: SAMPLE
+  #   value: text
+
+# podDisruptionBudget -- disruption budget for pod
+podDisruptionBudget: {}
+
+# nginxConf -- nginx config to provision inside of the container
+nginxConf: |-
+  # nginx version: ENV_NGINX_VERSION_ENV
+  user             nginx;
+  worker_processes auto;
+  error_log        /var/log/nginx/error.log warn;
+  pid              /var/run/nginx.pid;
+  events {
+      worker_connections 1024;
+  }
+  http {
+      include           /etc/nginx/mime.types;
+      default_type      application/octet-stream;
+      log_format        main '$remote_addr - $remote_user [$time_local] "$request" '
+                             '$status $body_bytes_sent "$http_referer" '
+                             '"$http_user_agent" "$http_x_forwarded_for" '
+                             '$request_time $upstream_response_time $pipe';
+      access_log        /var/log/nginx/access.log main;
+      sendfile          on;
+      keepalive_timeout 65;
+      server {
+          listen      80;
+          server_name localhost;
+          location / {
+              default_type text/plain;
+              access_log   off;
+              error_log    off;
+              return 200   'ok';
+          }
+      }
+  }
+
+# useDebugBinary -- run nginx-debug binary instead of normal one
+useDebugBinary: false
+
+dnsmasq:
+  # dnsmasq.enabled -- enable simple dns server for nginx
+  enabled: false

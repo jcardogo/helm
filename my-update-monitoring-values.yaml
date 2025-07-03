@@ -1,0 +1,25 @@
+grafana:
+  adminPassword: "alejandro1986"
+  service:
+    type: NodePort
+    nodePort: 32000 # Optional: Specify a fixed NodePort
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi # Note: 'M' is typically equivalent to 'Mi' for memory in K8s
+prometheus:
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi # Adjust size as needed
+          storageClassName: local-path
+  service:
+    type: NodePort
+    nodePort: 30090
